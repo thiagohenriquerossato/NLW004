@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { getConnection } from 'typeorm';
 import { app } from '../app';
 import createConnection from '../database';
 
@@ -7,10 +8,16 @@ describe("Surveys", ()=>{
         const connection = await createConnection();
         await connection.runMigrations();
         
-    })
+    });
+
+    afterAll(async()=>{
+        const connection = getConnection();
+        await connection.dropDatabase();
+        await connection.close();
+    });
     
     it("Should be able to create survey", async () => {
-        const response = await request(app).post("/Surveys")
+        const response = await request(app).post("/surveys")
             .send({
             title: "Title Example",
             description: "Description Example",
@@ -22,7 +29,7 @@ describe("Surveys", ()=>{
     });
 
     it("Should be able to get all surveys", async () => {
-        await request(app).post("/Surveys")
+        await request(app).post("/surveys")
             .send({
             title: "Title Example 2",
             description: "Description Example 2",
